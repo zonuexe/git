@@ -27,12 +27,65 @@ Git is unlikely to use for a native hook later on. For example, Git is much less
 likely to create a `mytool-validate-commit` hook than it is to create a
 `validate-commit` hook.
 
+This command parses the default configuration files for pairs of configs like
+so:
+
+  [hook "linter"]
+    event = pre-commit
+    command = ~/bin/linter --c
+
+In this example, `[hook "linter"]` represents one script - `~/bin/linter --c` -
+which can be shared by many repos, and even by many hook events, if appropriate.
+
+Commands are run in the order Git encounters their associated
+`hook.<name>.event` configs during the configuration parse (see
+linkgit:git-config[1]). Although multiple `hook.linter.event` configs can be
+added, only one `hook.linter.command` event is valid - Git uses "last-one-wins"
+to determine which command to run.
+
+So if you wanted your linter to run when you commit as well as when you push,
+you would configure it like so:
+
+  [hook "linter"]
+    event = pre-commit
+    event = pre-push
+    command = ~/bin/linter --c
+
+With this config, `~/bin/linter --c` would be run by Git before a commit is
+generated (during `pre-commit`) as well as before a push is performed (during
+`pre-push`).
+
+And if you wanted to run your linter as well as a secret-leak detector during
+only the "pre-commit" hook event, you would configure it instead like so:
+
+  [hook "linter"]
+    event = pre-commit
+    command = ~/bin/linter --c
+  [hook "no-leaks"]
+    event = pre-commit
+    command = ~/bin/leak-detector
+
+With this config, before a commit is generated (during `pre-commit`), Git would
+first start `~/bin/linter --c` and second start `~/bin/leak-detector`. It would
+evaluate the output of each when deciding whether to proceed with the commit.
+
+For a full list of hook events which you can set your `hook.<name>.event` to,
+and how hooks are invoked during those events, see linkgit:githooks[5].
+
+In general, when instructions suggest adding a script to
+`.git/hooks/<hook-event>`, you can specify it in the config instead by running
+`git config --add hook.<some-name>.command <path-to-script> && git config --add
+hook.<some-name>.event <hook-event>` - this way you can share the script between
+multiple repos. That is, `cp ~/my-script.sh ~/project/.git/hooks/pre-commit`
+would become `git config --add hook.my-script.command ~/my-script.sh && git
+config --add hook.my-script.event pre-commit`.
+
 SUBCOMMANDS
 -----------
 
 run::
-	Run the `<hook-name>` hook. See linkgit:githooks[5] for
-	the hook names we support.
+	Runs hooks configured for `<hook-name>`, in the order they are
+	discovered during the config parse.
 +
 Any positional arguments to the hook should be passed after an
 optional `--` (or `--end-of-options`, see linkgit:gitcli[7]). The
