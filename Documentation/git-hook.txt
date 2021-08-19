@@ -10,6 +10,7 @@ SYNOPSIS
 [verse]
 'git hook' run [--to-stdin=<path>] [--ignore-missing] [(-j|--jobs) <n>]
 	<hook-name> [-- <hook-args>]
+'git hook' list <hook-name>
 
 DESCRIPTION
 -----------
@@ -29,6 +30,10 @@ Any positional arguments to the hook should be passed after an
 optional `--` (or `--end-of-options`, see linkgit:gitcli[7]). The
 arguments (if any) differ by hook name, see linkgit:githooks[5] for
 what those are.
+
+list::
+	Print a list of hooks which will be run on `<hook-name>` event. If no
+	hooks are configured for that event, print nothing and return 1.
 
 OPTIONS
 -------

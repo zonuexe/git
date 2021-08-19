@@ -96,6 +96,7 @@ struct list_head *list_hooks(const char *hookname)
 {
 	struct list_head *hook_head = xmalloc(sizeof(struct list_head));
 
+
 	INIT_LIST_HEAD(hook_head);
 
 	if (!hookname)
@@ -103,8 +104,6 @@ struct list_head *list_hooks(const char *hookname)
 
 	if (have_git_dir()) {
 		const char *hook_path = find_hook(hookname);
-
-		/* Add the hook from the hookdir */
 		if (hook_path) {
 			struct hook *to_add = xmalloc(sizeof(*to_add));
 			to_add->hook_path = hook_path;
