@@ -103,5 +103,5 @@ submodule.superprojectGitDir::
 	should be linked to it. It is set automatically during
 	submodule creation.
 +
-	Because of this configuration variable, it is forbidden to use the
-	same submodule worktree shared by multiple superprojects.
+Because of this configuration variable, it is forbidden to use the
+same submodule worktree shared by multiple superprojects.
