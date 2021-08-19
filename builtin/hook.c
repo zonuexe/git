@@ -46,7 +46,7 @@ static int list(int argc, const char **argv, const char *prefix)
 
 	hookname = argv[0];
 
-	head = hook_list(hookname);
+	head = list_hooks_gently(hookname);
 
 	if (list_empty(head))
 		return 1;
@@ -105,7 +105,7 @@ static int run(int argc, const char **argv, const char *prefix)
 	git_config(git_default_config, NULL);
 
 	hook_name = argv[0];
-	hooks = list_hooks(hook_name);
+	hooks = list_hooks_gently(hook_name);
 	if (list_empty(hooks)) {
 		/* ... act like run_hooks_oneshot() under --ignore-missing */
 		if (ignore_missing)

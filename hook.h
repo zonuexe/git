@@ -9,8 +9,16 @@
  * Returns the path to the hook file, or NULL if the hook is missing
  * or disabled. Note that this points to static storage that will be
  * overwritten by further calls to find_hook and run_hook_*.
+ *
+ * If the hook is not a native hook (e.g. present in Documentation/githooks.txt)
+ * find_hook() will BUG(). find_hook_gently() does not consult the native hook
+ * list and will check for any hook name in the hooks directory regardless of
+ * whether it is known. find_hook() should be used by internal calls to hooks,
+ * and find_hook_gently() should only be used when the hookname was provided by
+ * the user, such as by 'git hook run my-wrapper-hook'.
  */
 const char *find_hook(const char *name);
+const char *find_hook_gently(const char *name);
 
 /*
  * A boolean version of find_hook()
@@ -32,8 +40,14 @@ struct hook {
 /*
  * Provides a linked list of 'struct hook' detailing commands which should run
  * in response to the 'hookname' event, in execution order.
+ *
+ * list_hooks() checks the provided hookname against Documentation/githooks.txt
+ * and BUG()s if it is not found.  list_hooks_gently() allows any hookname. The
+ * latter should only be used when the hook name is provided by the user, and
+ * the former should be used by internal callers.
  */
 struct list_head *list_hooks(const char *hookname);
+struct list_head *list_hooks_gently(const char *hookname);
 
 struct run_hooks_opt
 {
