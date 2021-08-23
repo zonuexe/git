@@ -1463,7 +1463,7 @@ static int write_reflog_expiry_table(struct reftable_writer *writer, void *argv)
 
 static int
 git_reftable_reflog_expire(struct ref_store *ref_store, const char *refname,
-			   const struct object_id *oid, unsigned int flags,
+			   unsigned int flags,
 			   reflog_expiry_prepare_fn prepare_fn,
 			   reflog_expiry_should_prune_fn should_prune_fn,
 			   reflog_expiry_cleanup_fn cleanup_fn,
@@ -1497,6 +1497,9 @@ git_reftable_reflog_expire(struct ref_store *ref_store, const char *refname,
 	struct reftable_iterator it = { NULL };
 	struct reftable_addition *add = NULL;
 	int err = 0;
+	int ignore_errno;
+	struct object_id oid;
+
 	if (refs->err < 0) {
 		return refs->err;
 	}
@@ -1515,7 +1518,14 @@ git_reftable_reflog_expire(struct ref_store *ref_store, const char *refname,
 	if (err) {
 		goto done;
 	}
-	prepare_fn(refname, oid, policy_cb_data);
+	if (!refs_resolve_ref_unsafe_with_errno(ref_store, refname,
+					       RESOLVE_REF_READING, &oid,
+					       NULL, &ignore_errno)) {
+		err = -1;
+		goto done;
+	}
+	prepare_fn(refname, &oid, policy_cb_data);
+
 	while (1) {
 		struct reftable_log_record log = { NULL };
 		int err = reftable_iterator_next_log(&it, &log);
