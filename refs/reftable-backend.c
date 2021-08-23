@@ -315,9 +315,11 @@ static int reftable_ref_iterator_advance(struct ref_iterator *ref_iterator)
 			break;
 		case REFTABLE_REF_SYMREF: {
 			int out_flags = 0;
-			const char *resolved = refs_resolve_ref_unsafe(
+			int ignore_errno;
+			const char *resolved = refs_resolve_ref_unsafe_with_errno(
 				ri->ref_store, ri->ref.refname,
-				RESOLVE_REF_READING, &ri->oid, &out_flags);
+				RESOLVE_REF_READING, &ri->oid, &out_flags,
+				&ignore_errno);
 			ri->base.flags = out_flags;
 			if (resolved == NULL &&
 			    !(ri->flags & DO_FOR_EACH_INCLUDE_BROKEN) &&
@@ -543,8 +545,10 @@ static int reftable_check_old_oid(struct ref_store *refs, const char *refname,
 {
 	struct object_id out_oid;
 	int out_flags = 0;
-	const char *resolved = refs_resolve_ref_unsafe(
-		refs, refname, RESOLVE_REF_READING, &out_oid, &out_flags);
+	int ignore_errno;
+	const char *resolved = refs_resolve_ref_unsafe_with_errno(
+		refs, refname, RESOLVE_REF_READING, &out_oid, &out_flags,
+		&ignore_errno);
 	if (is_null_oid(want_oid) != (resolved == NULL)) {
 		return REFTABLE_LOCK_ERROR;
 	}
@@ -845,20 +849,24 @@ static int write_create_symref_table(struct reftable_writer *writer, void *arg)
 		struct reftable_log_record log = { NULL };
 		struct object_id new_oid;
 		struct object_id old_oid;
+		int ignore_errno;
 
 		fill_reftable_log_record(&log);
 		log.refname = (char *)create->refname;
 		log.update_index = ts;
 		log.value.update.message = (char *)create->logmsg;
-		if (refs_resolve_ref_unsafe(
+		if (refs_resolve_ref_unsafe_with_errno(
 			    (struct ref_store *)create->refs, create->refname,
-			    RESOLVE_REF_READING, &old_oid, NULL) != NULL) {
+			    RESOLVE_REF_READING, &old_oid, NULL,
+			    &ignore_errno)) {
 			log.value.update.old_hash = old_oid.hash;
 		}
 
-		if (refs_resolve_ref_unsafe((struct ref_store *)create->refs,
-					    create->target, RESOLVE_REF_READING,
-					    &new_oid, NULL) != NULL) {
+		if (refs_resolve_ref_unsafe_with_errno((struct ref_store *)create->refs,
+						       create->target,
+						       RESOLVE_REF_READING,
+						       &new_oid, NULL,
+						       &ignore_errno)) {
 			log.value.update.new_hash = new_oid.hash;
 		}
 
