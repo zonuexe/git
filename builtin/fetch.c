@@ -757,6 +757,9 @@ static void prepare_format_display(struct ref *ref_map)
 		die(_("configuration fetch.output contains invalid value %s"),
 		    format);
 
+	if (verbosity < 0)
+		return;
+
 	for (rm = ref_map; rm; rm = rm->next) {
 		if (rm->status == REF_STATUS_REJECT_SHALLOW ||
 		    !rm->peer_ref ||
@@ -827,7 +830,12 @@ static void format_display(struct strbuf *display, char code,
 			   const char *remote, const char *local,
 			   int summary_width)
 {
-	int width = (summary_width + strlen(summary) - gettext_width(summary));
+	int width;
+
+	if (verbosity < 0)
+		return;
+
+	width = (summary_width + strlen(summary) - gettext_width(summary));
 
 	strbuf_addf(display, "%c %-*s ", code, width, summary);
 	if (!compact_format)
