@@ -48,6 +48,16 @@ int cmd_upload_pack(int argc, const char **argv, const char *prefix)
 	if (!enter_repo(dir, strict))
 		die("'%s' does not appear to be a git repository", dir);
 
+	/*
+	 * Increase the stdio buffer size for stdout, for the benefit of ref
+	 * advertisement writes. We are only allowed to call setvbuf(3) "after
+	 * opening a stream and before any other operations have been performed
+	 * on it", so let's call it before we have written anything to stdout.
+	 */
+	if (setvbuf(stdout, xmalloc(LARGE_PACKET_MAX), _IOFBF,
+			LARGE_PACKET_MAX))
+		die_errno("failed to grow stdout buffer");
+
 	switch (determine_protocol_version_server()) {
 	case protocol_v2:
 		serve_opts.advertise_capabilities = opts.advertise_refs;

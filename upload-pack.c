@@ -58,6 +58,7 @@ enum allow_uor {
  */
 struct upload_pack_data {
 	struct string_list symref;				/* v0 only */
+	struct strbuf send_ref_buf;				/* v0 only */
 	struct object_array want_obj;
 	struct object_array have_obj;
 	struct oid_array haves;					/* v2 only */
@@ -126,6 +127,7 @@ static void upload_pack_data_init(struct upload_pack_data *data)
 	struct string_list uri_protocols = STRING_LIST_INIT_DUP;
 	struct object_array extra_edge_obj = OBJECT_ARRAY_INIT;
 	struct string_list allowed_filters = STRING_LIST_INIT_DUP;
+	struct strbuf send_ref_buf = STRBUF_INIT;
 
 	memset(data, 0, sizeof(*data));
 	data->symref = symref;
@@ -141,6 +143,7 @@ static void upload_pack_data_init(struct upload_pack_data *data)
 	data->allow_filter_fallback = 1;
 	data->tree_filter_max_depth = ULONG_MAX;
 	packet_writer_init(&data->writer, 1);
+	data->send_ref_buf = send_ref_buf;
 
 	data->keepalive = 5;
 	data->advertise_sid = 0;
@@ -158,6 +161,7 @@ static void upload_pack_data_clear(struct upload_pack_data *data)
 	object_array_clear(&data->extra_edge_obj);
 	list_objects_filter_release(&data->filter_options);
 	string_list_clear(&data->allowed_filters, 0);
+	strbuf_release(&data->send_ref_buf);
 
 	free((char *)data->pack_objects_hook);
 }
@@ -1201,13 +1205,14 @@ static int send_ref(const char *refname, const struct object_id *oid,
 	if (mark_our_ref(refname_nons, refname, oid))
 		return 0;
 
+	strbuf_reset(&data->send_ref_buf);
 	if (capabilities) {
 		struct strbuf symref_info = STRBUF_INIT;
 		struct strbuf session_id = STRBUF_INIT;
 
 		format_symref_info(&symref_info, &data->symref);
 		format_session_id(&session_id, data);
-		packet_write_fmt(1, "%s %s%c%s%s%s%s%s%s%s object-format=%s agent=%s\n",
+		packet_buf_write(&data->send_ref_buf, "%s %s%c%s%s%s%s%s%s%s object-format=%s agent=%s\n",
 			     oid_to_hex(oid), refname_nons,
 			     0, capabilities,
 			     (data->allow_uor & ALLOW_TIP_SHA1) ?
@@ -1223,11 +1228,12 @@ static int send_ref(const char *refname, const struct object_id *oid,
 		strbuf_release(&symref_info);
 		strbuf_release(&session_id);
 	} else {
-		packet_write_fmt(1, "%s %s\n", oid_to_hex(oid), refname_nons);
+		packet_buf_write(&data->send_ref_buf, "%s %s\n", oid_to_hex(oid), refname_nons);
 	}
 	capabilities = NULL;
 	if (!peel_iterated_oid(oid, &peeled))
-		packet_write_fmt(1, "%s %s^{}\n", oid_to_hex(&peeled), refname_nons);
+		packet_buf_write(&data->send_ref_buf, "%s %s^{}\n", oid_to_hex(&peeled), refname_nons);
+	fwrite_or_die(stdout, data->send_ref_buf.buf, data->send_ref_buf.len);
 	return 0;
 }
 
@@ -1348,6 +1354,9 @@ void upload_pack(struct upload_pack_options *options)
 		reset_timeout(data.timeout);
 		head_ref_namespaced(send_ref, &data);
 		for_each_namespaced_ref(send_ref, &data);
+		/* Call fflush because send_ref uses stdio. */
+		if (fflush(stdout))
+			die_errno(_("write failure on standard output"));
 		advertise_shallow_grafts(1);
 		packet_flush(1);
 	} else {
