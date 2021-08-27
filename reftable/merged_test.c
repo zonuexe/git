@@ -95,7 +95,7 @@ static void readers_destroy(struct reftable_reader **readers, size_t n)
 	reftable_free(readers);
 }
 
-static void test_merged_between(void)
+static void test_merged_between(const char *fn_name)
 {
 	uint8_t hash1[GIT_SHA1_RAWSZ] = { 1, 2, 3, 0 };
 
@@ -137,7 +137,7 @@ static void test_merged_between(void)
 	reftable_free(bs);
 }
 
-static void test_merged(void)
+static void test_merged(const char *fn_name)
 {
 	uint8_t hash1[GIT_SHA1_RAWSZ] = { 1 };
 	uint8_t hash2[GIT_SHA1_RAWSZ] = { 2 };
@@ -237,7 +237,7 @@ static void test_merged(void)
 	reftable_free(bs);
 }
 
-static void test_default_write_opts(void)
+static void test_default_write_opts(const char *fn_name)
 {
 	struct reftable_write_options opts = { 0 };
 	struct strbuf buf = STRBUF_INIT;

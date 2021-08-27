@@ -62,9 +62,9 @@ static char *get_tmp_dir(const char *prefix)
 	return dir;
 }
 
-static void test_read_file(void)
+static void test_read_file(const char *fn_name)
 {
-	char *fn = get_tmp_template(__FUNCTION__);
+	char *fn = get_tmp_template(fn_name);
 	int fd = mkstemp(fn);
 	char out[1024] = "line1\n\nline2\nline3";
 	int n, err;
@@ -88,7 +88,7 @@ static void test_read_file(void)
 	remove(fn);
 }
 
-static void test_parse_names(void)
+static void test_parse_names(const char *fn_name)
 {
 	char buf[] = "line\n";
 	char **names = NULL;
@@ -100,7 +100,7 @@ static void test_parse_names(void)
 	free_names(names);
 }
 
-static void test_names_equal(void)
+static void test_names_equal(const char *fn_name)
 {
 	char *a[] = { "a", "b", "c", NULL };
 	char *b[] = { "a", "b", "d", NULL };
@@ -131,9 +131,9 @@ static int write_test_log(struct reftable_writer *wr, void *arg)
 	return reftable_writer_add_log(wr, wla->log);
 }
 
-static void test_reftable_stack_add_one(void)
+static void test_reftable_stack_add_one(const char *fn_name)
 {
-	char *dir = get_tmp_dir(__FUNCTION__);
+	char *dir = get_tmp_dir(fn_name);
 
 	struct reftable_write_options cfg = { 0 };
 	struct reftable_stack *st = NULL;
@@ -169,12 +169,12 @@ static void test_reftable_stack_add_one(void)
 	clear_dir(dir);
 }
 
-static void test_reftable_stack_uptodate(void)
+static void test_reftable_stack_uptodate(const char *fn_name)
 {
 	struct reftable_write_options cfg = { 0 };
 	struct reftable_stack *st1 = NULL;
 	struct reftable_stack *st2 = NULL;
-	char *dir = get_tmp_dir(__FUNCTION__);
+	char *dir = get_tmp_dir(fn_name);
 
 	int err;
 	struct reftable_ref_record ref1 = {
@@ -216,9 +216,9 @@ static void test_reftable_stack_uptodate(void)
 	clear_dir(dir);
 }
 
-static void test_reftable_stack_transaction_api(void)
+static void test_reftable_stack_transaction_api(const char *fn_name)
 {
-	char *dir = get_tmp_dir(__FUNCTION__);
+	char *dir = get_tmp_dir(fn_name);
 
 	struct reftable_write_options cfg = { 0 };
 	struct reftable_stack *st = NULL;
@@ -260,12 +260,12 @@ static void test_reftable_stack_transaction_api(void)
 	clear_dir(dir);
 }
 
-static void test_reftable_stack_validate_refname(void)
+static void test_reftable_stack_validate_refname(const char *fn_name)
 {
 	struct reftable_write_options cfg = { 0 };
 	struct reftable_stack *st = NULL;
 	int err;
-	char *dir = get_tmp_dir(__FUNCTION__);
+	char *dir = get_tmp_dir(fn_name);
 
 	int i;
 	struct reftable_ref_record ref = {
@@ -303,9 +303,9 @@ static int write_error(struct reftable_writer *wr, void *arg)
 	return *((int *)arg);
 }
 
-static void test_reftable_stack_update_index_check(void)
+static void test_reftable_stack_update_index_check(const char *fn_name)
 {
-	char *dir = get_tmp_dir(__FUNCTION__);
+	char *dir = get_tmp_dir(fn_name);
 
 	struct reftable_write_options cfg = { 0 };
 	struct reftable_stack *st = NULL;
@@ -335,9 +335,9 @@ static void test_reftable_stack_update_index_check(void)
 	clear_dir(dir);
 }
 
-static void test_reftable_stack_lock_failure(void)
+static void test_reftable_stack_lock_failure(const char *fn_name)
 {
-	char *dir = get_tmp_dir(__FUNCTION__);
+	char *dir = get_tmp_dir(fn_name);
 
 	struct reftable_write_options cfg = { 0 };
 	struct reftable_stack *st = NULL;
@@ -354,7 +354,7 @@ static void test_reftable_stack_lock_failure(void)
 	clear_dir(dir);
 }
 
-static void test_reftable_stack_add(void)
+static void test_reftable_stack_add(const char *fn_name)
 {
 	int i = 0;
 	int err = 0;
@@ -362,7 +362,7 @@ static void test_reftable_stack_add(void)
 		.exact_log_message = 1,
 	};
 	struct reftable_stack *st = NULL;
-	char *dir = get_tmp_dir(__FUNCTION__);
+	char *dir = get_tmp_dir(fn_name);
 
 	struct reftable_ref_record refs[2] = { { NULL } };
 	struct reftable_log_record logs[2] = { { NULL } };
@@ -436,14 +436,14 @@ static void test_reftable_stack_add(void)
 	clear_dir(dir);
 }
 
-static void test_reftable_stack_log_normalize(void)
+static void test_reftable_stack_log_normalize(const char *fn_name)
 {
 	int err = 0;
 	struct reftable_write_options cfg = {
 		0,
 	};
 	struct reftable_stack *st = NULL;
-	char *dir = get_tmp_dir(__FUNCTION__);
+	char *dir = get_tmp_dir(fn_name);
 
 
 	uint8_t h1[GIT_SHA1_RAWSZ] = { 0x01 }, h2[GIT_SHA1_RAWSZ] = { 0x02 };
@@ -492,10 +492,10 @@ static void test_reftable_stack_log_normalize(void)
 	clear_dir(dir);
 }
 
-static void test_reftable_stack_tombstone(void)
+static void test_reftable_stack_tombstone(const char *fn_name)
 {
 	int i = 0;
-	char *dir = get_tmp_dir(__FUNCTION__);
+	char *dir = get_tmp_dir(fn_name);
 
 	struct reftable_write_options cfg = { 0 };
 	struct reftable_stack *st = NULL;
@@ -575,9 +575,9 @@ static void test_reftable_stack_tombstone(void)
 	clear_dir(dir);
 }
 
-static void test_reftable_stack_hash_id(void)
+static void test_reftable_stack_hash_id(const char *fn_name)
 {
-	char *dir = get_tmp_dir(__FUNCTION__);
+	char *dir = get_tmp_dir(fn_name);
 
 	struct reftable_write_options cfg = { 0 };
 	struct reftable_stack *st = NULL;
@@ -619,14 +619,14 @@ static void test_reftable_stack_hash_id(void)
 	clear_dir(dir);
 }
 
-static void test_log2(void)
+static void test_log2(const char *fn_name)
 {
 	EXPECT(1 == fastlog2(3));
 	EXPECT(2 == fastlog2(4));
 	EXPECT(2 == fastlog2(5));
 }
 
-static void test_sizes_to_segments(void)
+static void test_sizes_to_segments(const char *fn_name)
 {
 	uint64_t sizes[] = { 2, 3, 4, 5, 7, 9 };
 	/* .................0  1  2  3  4  5 */
@@ -644,7 +644,7 @@ static void test_sizes_to_segments(void)
 	reftable_free(segs);
 }
 
-static void test_sizes_to_segments_empty(void)
+static void test_sizes_to_segments_empty(const char *fn_name)
 {
 	int seglen = 0;
 	struct segment *segs = sizes_to_segments(&seglen, NULL, 0);
@@ -652,7 +652,7 @@ static void test_sizes_to_segments_empty(void)
 	reftable_free(segs);
 }
 
-static void test_sizes_to_segments_all_equal(void)
+static void test_sizes_to_segments_all_equal(const char *fn_name)
 {
 	uint64_t sizes[] = { 5, 5 };
 
@@ -665,7 +665,7 @@ static void test_sizes_to_segments_all_equal(void)
 	reftable_free(segs);
 }
 
-static void test_suggest_compaction_segment(void)
+static void test_suggest_compaction_segment(const char *fn_name)
 {
 	uint64_t sizes[] = { 128, 64, 17, 16, 9, 9, 9, 16, 16 };
 	/* .................0    1    2  3   4  5  6 */
@@ -675,7 +675,7 @@ static void test_suggest_compaction_segment(void)
 	EXPECT(min.end == 7);
 }
 
-static void test_suggest_compaction_segment_nothing(void)
+static void test_suggest_compaction_segment_nothing(const char *fn_name)
 {
 	uint64_t sizes[] = { 64, 32, 16, 8, 4, 2 };
 	struct segment result =
@@ -683,9 +683,9 @@ static void test_suggest_compaction_segment_nothing(void)
 	EXPECT(result.start == result.end);
 }
 
-static void test_reflog_expire(void)
+static void test_reflog_expire(const char *fn_name)
 {
-	char *dir = get_tmp_dir(__FUNCTION__);
+	char *dir = get_tmp_dir(fn_name);
 
 	struct reftable_write_options cfg = { 0 };
 	struct reftable_stack *st = NULL;
@@ -761,12 +761,12 @@ static int write_nothing(struct reftable_writer *wr, void *arg)
 	return 0;
 }
 
-static void test_empty_add(void)
+static void test_empty_add(const char *fn_name)
 {
 	struct reftable_write_options cfg = { 0 };
 	struct reftable_stack *st = NULL;
 	int err;
-	char *dir = get_tmp_dir(__FUNCTION__);
+	char *dir = get_tmp_dir(fn_name);
 
 	struct reftable_stack *st2 = NULL;
 
@@ -784,11 +784,11 @@ static void test_empty_add(void)
 	reftable_stack_destroy(st2);
 }
 
-static void test_reftable_stack_auto_compaction(void)
+static void test_reftable_stack_auto_compaction(const char *fn_name)
 {
 	struct reftable_write_options cfg = { 0 };
 	struct reftable_stack *st = NULL;
-	char *dir = get_tmp_dir(__FUNCTION__);
+	char *dir = get_tmp_dir(fn_name);
 
 	int err, i;
 	int N = 100;
@@ -819,11 +819,11 @@ static void test_reftable_stack_auto_compaction(void)
 	clear_dir(dir);
 }
 
-static void test_reftable_stack_compaction_concurrent(void)
+static void test_reftable_stack_compaction_concurrent(const char *fn_name)
 {
 	struct reftable_write_options cfg = { 0 };
 	struct reftable_stack *st1 = NULL, *st2 = NULL;
-	char *dir = get_tmp_dir(__FUNCTION__);
+	char *dir = get_tmp_dir(fn_name);
 
 	int err, i;
 	int N = 3;
@@ -869,11 +869,11 @@ static void unclean_stack_close(struct reftable_stack *st)
 	FREE_AND_NULL(st->readers);
 }
 
-static void test_reftable_stack_compaction_concurrent_clean(void)
+static void test_reftable_stack_compaction_concurrent_clean(const char *fn_name)
 {
 	struct reftable_write_options cfg = { 0 };
 	struct reftable_stack *st1 = NULL, *st2 = NULL, *st3 = NULL;
-	char *dir = get_tmp_dir(__FUNCTION__);
+	char *dir = get_tmp_dir(fn_name);
 
 	int err, i;
 	int N = 3;

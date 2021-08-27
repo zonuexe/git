@@ -15,7 +15,7 @@ https://developers.google.com/open-source/licenses/bsd
 #include "reftable-tests.h"
 #include "test_framework.h"
 
-static void test_pq(void)
+static void test_pq(const char *fn_name)
 {
 	char *names[54] = { NULL };
 	int N = ARRAY_SIZE(names) - 1;

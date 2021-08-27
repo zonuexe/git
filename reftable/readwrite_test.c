@@ -20,7 +20,7 @@ https://developers.google.com/open-source/licenses/bsd
 
 static const int update_index = 5;
 
-static void test_buffer(void)
+static void test_buffer(const char *fn_name)
 {
 	struct strbuf buf = STRBUF_INIT;
 	struct reftable_block_source source = { NULL };
@@ -114,7 +114,7 @@ static void write_table(char ***names, struct strbuf *buf, int N,
 	reftable_writer_free(w);
 }
 
-static void test_log_buffer_size(void)
+static void test_log_buffer_size(const char *fn_name)
 {
 	struct strbuf buf = STRBUF_INIT;
 	struct reftable_write_options opts = {
@@ -155,7 +155,7 @@ static void test_log_buffer_size(void)
 	strbuf_release(&buf);
 }
 
-static void test_log_write_read(void)
+static void test_log_write_read(const char *fn_name)
 {
 	int N = 2;
 	char **names = reftable_calloc(sizeof(char *) * (N + 1));
@@ -254,7 +254,7 @@ static void test_log_write_read(void)
 	reader_close(&rd);
 }
 
-static void test_table_read_write_sequential(void)
+static void test_table_read_write_sequential(const char *fn_name)
 {
 	char **names;
 	struct strbuf buf = STRBUF_INIT;
@@ -296,7 +296,7 @@ static void test_table_read_write_sequential(void)
 	reader_close(&rd);
 }
 
-static void test_table_write_small_table(void)
+static void test_table_write_small_table(const char *fn_name)
 {
 	char **names;
 	struct strbuf buf = STRBUF_INIT;
@@ -307,7 +307,7 @@ static void test_table_write_small_table(void)
 	free_names(names);
 }
 
-static void test_table_read_api(void)
+static void test_table_read_api(const char *fn_name)
 {
 	char **names;
 	struct strbuf buf = STRBUF_INIT;
@@ -406,17 +406,17 @@ static void test_table_read_write_seek(int index, int hash_id)
 	reader_close(&rd);
 }
 
-static void test_table_read_write_seek_linear(void)
+static void test_table_read_write_seek_linear(const char *fn_name)
 {
 	test_table_read_write_seek(0, GIT_SHA1_FORMAT_ID);
 }
 
-static void test_table_read_write_seek_linear_sha256(void)
+static void test_table_read_write_seek_linear_sha256(const char *fn_name)
 {
 	test_table_read_write_seek(0, GIT_SHA256_FORMAT_ID);
 }
 
-static void test_table_read_write_seek_index(void)
+static void test_table_read_write_seek_index(const char *fn_name)
 {
 	test_table_read_write_seek(1, GIT_SHA1_FORMAT_ID);
 }
@@ -522,17 +522,17 @@ static void test_table_refs_for(int indexed)
 	reader_close(&rd);
 }
 
-static void test_table_refs_for_no_index(void)
+static void test_table_refs_for_no_index(const char *fn_name)
 {
 	test_table_refs_for(0);
 }
 
-static void test_table_refs_for_obj_index(void)
+static void test_table_refs_for_obj_index(const char *fn_name)
 {
 	test_table_refs_for(1);
 }
 
-static void test_write_empty_table(void)
+static void test_write_empty_table(const char *fn_name)
 {
 	struct reftable_write_options opts = { 0 };
 	struct strbuf buf = STRBUF_INIT;
@@ -568,7 +568,7 @@ static void test_write_empty_table(void)
 	strbuf_release(&buf);
 }
 
-static void test_write_key_order(void)
+static void test_write_key_order(const char *fn_name)
 {
 	struct reftable_write_options opts = { 0 };
 	struct strbuf buf = STRBUF_INIT;
@@ -604,7 +604,7 @@ static void test_write_key_order(void)
 	strbuf_release(&buf);
 }
 
-static void test_corrupt_table_empty(void)
+static void test_corrupt_table_empty(const char *fn_name)
 {
 	struct strbuf buf = STRBUF_INIT;
 	struct reftable_block_source source = { NULL };
@@ -616,7 +616,7 @@ static void test_corrupt_table_empty(void)
 	EXPECT(err == REFTABLE_FORMAT_ERROR);
 }
 
-static void test_corrupt_table(void)
+static void test_corrupt_table(const char *fn_name)
 {
 	uint8_t zeros[1024] = { 0 };
 	struct strbuf buf = STRBUF_INIT;

@@ -42,7 +42,7 @@ https://developers.google.com/open-source/licenses/bsd
 #define RUN_TEST(f)                          \
 	fprintf(stderr, "running %s\n", #f); \
 	fflush(stderr);                      \
-	f();
+	f(#f);
 
 void set_test_hash(uint8_t *p, int i);
 

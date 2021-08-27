@@ -36,7 +36,7 @@ static void test_copy(struct reftable_record *rec)
 	reftable_record_destroy(&copy);
 }
 
-static void test_varint_roundtrip(void)
+static void test_varint_roundtrip(const char *fn_name)
 {
 	uint64_t inputs[] = { 0,
 			      1,
@@ -68,7 +68,7 @@ static void test_varint_roundtrip(void)
 	}
 }
 
-static void test_common_prefix(void)
+static void test_common_prefix(const char *fn_name)
 {
 	struct {
 		const char *a, *b;
@@ -101,7 +101,7 @@ static void set_hash(uint8_t *h, int j)
 	}
 }
 
-static void test_reftable_ref_record_roundtrip(void)
+static void test_reftable_ref_record_roundtrip(const char *fn_name)
 {
 	int i = 0;
 
@@ -164,7 +164,7 @@ static void test_reftable_ref_record_roundtrip(void)
 	}
 }
 
-static void test_reftable_log_record_equal(void)
+static void test_reftable_log_record_equal(const char *fn_name)
 {
 	struct reftable_log_record in[2] = {
 		{
@@ -184,7 +184,7 @@ static void test_reftable_log_record_equal(void)
 	reftable_log_record_release(&in[1]);
 }
 
-static void test_reftable_log_record_roundtrip(void)
+static void test_reftable_log_record_roundtrip(const char *fn_name)
 {
 	int i;
 	struct reftable_log_record in[2] = {
@@ -258,7 +258,7 @@ static void test_reftable_log_record_roundtrip(void)
 	}
 }
 
-static void test_u24_roundtrip(void)
+static void test_u24_roundtrip(const char *fn_name)
 {
 	uint32_t in = 0x112233;
 	uint8_t dest[3];
@@ -268,7 +268,7 @@ static void test_u24_roundtrip(void)
 	EXPECT(in == out);
 }
 
-static void test_key_roundtrip(void)
+static void test_key_roundtrip(const char *fn_name)
 {
 	uint8_t buffer[1024] = { 0 };
 	struct string_view dest = {
@@ -300,7 +300,7 @@ static void test_key_roundtrip(void)
 	strbuf_release(&roundtrip);
 }
 
-static void test_reftable_obj_record_roundtrip(void)
+static void test_reftable_obj_record_roundtrip(const char *fn_name)
 {
 	uint8_t testHash1[GIT_SHA1_RAWSZ] = { 1, 2, 3, 4, 0 };
 	uint64_t till9[] = { 1, 2, 3, 4, 500, 600, 700, 800, 9000 };
@@ -358,7 +358,7 @@ static void test_reftable_obj_record_roundtrip(void)
 	}
 }
 
-static void test_reftable_index_record_roundtrip(void)
+static void test_reftable_index_record_roundtrip(const char *fn_name)
 {
 	struct reftable_index_record in = {
 		.offset = 42,

@@ -16,7 +16,7 @@ https://developers.google.com/open-source/licenses/bsd
 #include "test_framework.h"
 #include "reftable-tests.h"
 
-static void test_block_read_write(void)
+static void test_block_read_write(const char *fn_name)
 {
 	const int header_off = 21; /* random */
 	char *names[30];

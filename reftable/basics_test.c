@@ -24,7 +24,7 @@ static int binsearch_func(size_t i, void *void_args)
 	return args->key < args->arr[i];
 }
 
-static void test_binsearch(void)
+static void test_binsearch(const char *fn_name)
 {
 	int arr[] = { 2, 4, 6, 8, 10 };
 	size_t sz = ARRAY_SIZE(arr);
@@ -49,13 +49,13 @@ static void test_binsearch(void)
 	}
 }
 
-static void test_names_length(void)
+static void test_names_length(const char *fn_name)
 {
 	char *a[] = { "a", "b", NULL };
 	EXPECT(names_length(a) == 2);
 }
 
-static void test_parse_names_normal(void)
+static void test_parse_names_normal(const char *fn_name)
 {
 	char in[] = "a\nb\n";
 	char **out = NULL;
@@ -66,7 +66,7 @@ static void test_parse_names_normal(void)
 	free_names(out);
 }
 
-static void test_parse_names_drop_empty(void)
+static void test_parse_names_drop_empty(const char *fn_name)
 {
 	char in[] = "a\n\n";
 	char **out = NULL;
@@ -76,7 +76,7 @@ static void test_parse_names_drop_empty(void)
 	free_names(out);
 }
 
-static void test_common_prefix(void)
+static void test_common_prefix(const char *fn_name)
 {
 	struct strbuf s1 = STRBUF_INIT;
 	struct strbuf s2 = STRBUF_INIT;

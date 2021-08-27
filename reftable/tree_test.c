@@ -31,7 +31,7 @@ static void check_increasing(void *arg, void *key)
 	c->last = key;
 }
 
-static void test_tree(void)
+static void test_tree(const char *fn_name)
 {
 	struct tree_node *root = NULL;
 

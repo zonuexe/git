@@ -26,7 +26,7 @@ struct testcase {
 	int error_code;
 };
 
-static void test_conflict(void)
+static void test_conflict(const char *fn_name)
 {
 	struct reftable_write_options opts = { 0 };
 	struct strbuf buf = STRBUF_INIT;
