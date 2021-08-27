@@ -1,6 +1,8 @@
 #ifndef FSMONITOR_IPC_H
 #define FSMONITOR_IPC_H
 
+#include "simple-ipc.h"
+
 /*
  * Returns true if built-in file system monitor daemon is defined
  * for this platform.
