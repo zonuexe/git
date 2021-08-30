@@ -107,7 +107,7 @@ static int send_ref(const char *refname, const struct object_id *oid,
 	}
 
 	strbuf_addch(&data->buf, '\n');
-	packet_write(1, data->buf.buf, data->buf.len);
+	packet_fwrite(stdout, data->buf.buf, data->buf.len);
 
 	return 0;
 }
@@ -172,6 +172,9 @@ int ls_refs(struct repository *r, struct packet_reader *request)
 		strvec_push(&data.prefixes, "");
 	for_each_fullref_in_prefixes(get_git_namespace(), data.prefixes.v,
 				     send_ref, &data, 0);
+	/* Call fflush because send_ref uses stdio. */
+	if (fflush(stdout))
+		die_errno(_("write failure on standard output"));
 	packet_flush(1);
 	strvec_clear(&data.prefixes);
 	strbuf_release(&data.buf);

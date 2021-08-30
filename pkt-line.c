@@ -243,6 +243,22 @@ void packet_write(int fd_out, const char *buf, size_t size)
 		die("%s", err.buf);
 }
 
+void packet_fwrite(FILE *f, const char *buf, size_t size)
+{
+	size_t packet_size;
+	char header[4];
+
+	if (size > LARGE_PACKET_DATA_MAX)
+		die(_("packet write failed - data exceeds max packet size"));
+
+	packet_trace(buf, size, 1);
+	packet_size = size + 4;
+
+	set_packet_header(header, packet_size);
+	fwrite_or_die(f, header, 4);
+	fwrite_or_die(f, buf, size);
+}
+
 void packet_buf_write(struct strbuf *buf, const char *fmt, ...)
 {
 	va_list args;
